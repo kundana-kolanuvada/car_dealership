@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { createVehicle, deleteVehicle, getVehicles, updateVehicle } from "../services/vehicle.service";
+import { createVehicle, deleteVehicle, getVehicles, restockVehicle, updateVehicle } from "../services/vehicle.service";
 
 const isNonEmptyString = (value: unknown): value is string =>
   typeof value === "string" && value.trim().length > 0;
@@ -80,6 +80,28 @@ export const remove = async (req: Request, res: Response, next: NextFunction): P
 
     await deleteVehicle(id);
     res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const restock = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const id = req.params.id;
+    const { quantity, ...extraFields } = req.body ?? {};
+    if (
+      typeof id !== "string" ||
+      id.trim().length === 0 ||
+      Object.keys(extraFields).length > 0 ||
+      !Number.isInteger(quantity) ||
+      quantity <= 0
+    ) {
+      res.status(400).json({ message: "A valid vehicle id and positive integer restock quantity are required" });
+      return;
+    }
+
+    const vehicle = await restockVehicle(id, quantity);
+    res.status(200).json({ vehicle });
   } catch (error) {
     next(error);
   }

@@ -80,3 +80,17 @@ export const deleteVehicle = async (id: string): Promise<void> => {
     throw error;
   }
 };
+
+export const restockVehicle = async (id: string, quantity: number): Promise<Vehicle> => {
+  try {
+    return await prisma.vehicle.update({
+      where: { id },
+      data: { quantity: { increment: quantity } },
+    });
+  } catch (error) {
+    if (isRecordNotFoundError(error)) {
+      throw new VehicleNotFoundError();
+    }
+    throw error;
+  }
+};
