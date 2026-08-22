@@ -45,3 +45,10 @@ export const purchaseVehicle = async (
       },
     });
   });
+
+export const getPurchasesForUser = async (userId: string) =>
+  prisma.purchase.findMany({
+    where: { userId },
+    include: { vehicle: true },
+    orderBy: { createdAt: "desc" },
+  });

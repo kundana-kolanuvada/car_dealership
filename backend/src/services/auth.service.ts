@@ -41,3 +41,8 @@ export const authenticateUser = async (email: string, password: string): Promise
 
   return sanitizeUser(user);
 };
+
+export const getUserById = async (id: string): Promise<PublicUser | null> => {
+  const user = await prisma.user.findUnique({ where: { id } });
+  return user ? sanitizeUser(user) : null;
+};

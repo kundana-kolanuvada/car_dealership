@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { authenticateUser, registerUser } from "../services/auth.service";
+import { getUserById } from "../services/auth.service";
+import { AuthenticatedRequest } from "../middleware/auth.middleware";
 
 const getJwtSecret = (): string => process.env.JWT_SECRET || "development-only-secret";
 
@@ -33,6 +35,20 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
 
     const user = await authenticateUser(req.body.email, req.body.password);
     res.status(200).json({ user, token: createToken(user.id, user.role) });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const me = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const user = await getUserById(req.user!.id);
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    res.status(200).json({ user });
   } catch (error) {
     next(error);
   }
