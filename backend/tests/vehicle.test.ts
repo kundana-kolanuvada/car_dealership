@@ -6,6 +6,8 @@ const prismaMock = {
   vehicle: {
     create: jest.fn(),
     findMany: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
   },
 };
 
@@ -14,6 +16,7 @@ jest.mock("../src/config/prisma", () => ({ prisma: prismaMock }));
 import app from "../src/app";
 
 const adminToken = jwt.sign({ sub: "admin-1", role: Role.ADMIN }, "development-only-secret");
+const userToken = jwt.sign({ sub: "user-1", role: Role.USER }, "development-only-secret");
 const vehicle = {
   id: "vehicle-1",
   make: "Toyota",
@@ -85,5 +88,67 @@ describe("GET /api/vehicles?search=", () => {
       },
       orderBy: { createdAt: "desc" },
     });
+  });
+});
+
+describe("PATCH /api/vehicles/:id", () => {
+  it("updates vehicle fields when requested by an administrator", async () => {
+    prismaMock.vehicle.update.mockResolvedValue({ ...vehicle, price: 31000, quantity: 2 });
+
+    const response = await request(app)
+      .patch(`/api/vehicles/${vehicle.id}`)
+      .set("Authorization", `Bearer ${adminToken}`)
+      .send({ price: 31000, quantity: 2 });
+
+    expect(response.status).toBe(200);
+    expect(response.body.vehicle).toMatchObject({ id: vehicle.id, price: 31000, quantity: 2 });
+    expect(prismaMock.vehicle.update).toHaveBeenCalledWith({
+      where: { id: vehicle.id },
+      data: { price: 31000, quantity: 2 },
+    });
+  });
+
+  it("rejects invalid update data", async () => {
+    const response = await request(app)
+      .patch(`/api/vehicles/${vehicle.id}`)
+      .set("Authorization", `Bearer ${adminToken}`)
+      .send({ quantity: -1 });
+
+    expect(response.status).toBe(400);
+    expect(prismaMock.vehicle.update).not.toHaveBeenCalled();
+  });
+
+  it("returns 404 when the vehicle does not exist", async () => {
+    prismaMock.vehicle.update.mockRejectedValue({ code: "P2025" });
+
+    const response = await request(app)
+      .patch("/api/vehicles/missing-vehicle")
+      .set("Authorization", `Bearer ${adminToken}`)
+      .send({ price: 31000 });
+
+    expect(response.status).toBe(404);
+    expect(response.body.message).toBe("Vehicle not found");
+  });
+});
+
+describe("DELETE /api/vehicles/:id", () => {
+  it("deletes a vehicle when requested by an administrator", async () => {
+    prismaMock.vehicle.delete.mockResolvedValue(vehicle);
+
+    const response = await request(app)
+      .delete(`/api/vehicles/${vehicle.id}`)
+      .set("Authorization", `Bearer ${adminToken}`);
+
+    expect(response.status).toBe(204);
+    expect(prismaMock.vehicle.delete).toHaveBeenCalledWith({ where: { id: vehicle.id } });
+  });
+
+  it("prevents non-administrators from deleting a vehicle", async () => {
+    const response = await request(app)
+      .delete(`/api/vehicles/${vehicle.id}`)
+      .set("Authorization", `Bearer ${userToken}`);
+
+    expect(response.status).toBe(403);
+    expect(prismaMock.vehicle.delete).not.toHaveBeenCalled();
   });
 });
