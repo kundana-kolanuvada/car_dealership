@@ -78,6 +78,8 @@ Verify the installations:
 node --version
 npm --version
 git --version
+```
+---
 
 ## AI Usage
 
