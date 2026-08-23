@@ -58,7 +58,7 @@ The backend is built using Node.js, TypeScript, Express.js, Prisma, and SQLite, 
 | Authentication | ![JWT](https://img.shields.io/badge/JWT-000000?logo=jsonwebtokens&logoColor=white) |
 | Password Hashing | ![bcrypt](https://img.shields.io/badge/bcrypt-338033?logo=letsencrypt&logoColor=white) |
 | Testing | ![Jest](https://img.shields.io/badge/Jest-C21325?logo=jest&logoColor=white) |
-| Version Control | ![Git](https://img.shields.io/badge/Git-F05032?logo=git&logoColor=white) ![GitHub](https://img.shields.io/badge/GitHub-181717?logo=github&logoColor=white) |
+| Version Control | ![GitHub](https://img.shields.io/badge/GitHub-181717?logo=github&logoColor=white) |
 | Development Environment | ![VS Code](https://img.shields.io/badge/VS%20Code-007ACC?logo=visual-studio-code&logoColor=white) |
 
 ---
