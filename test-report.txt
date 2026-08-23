@@ -1,0 +1,30 @@
+# AutoElite Car Dealership - Test Report
+
+## Test Command
+
+```bash
+npm test
+```
+
+## Test Environment
+
+- Test Runner: Jest
+- Execution Mode: `--runInBand`
+
+## Test Result
+
+**Status: PASS**
+
+- Test Suites: 4 passed, 4 total
+- Tests: 20 passed, 20 total
+- Snapshots: 0 total
+- Total Time: 37.385 seconds
+
+## Test Suites
+
+| Test Suite | Result |
+|---|---|
+| `tests/purchase.test.ts` | PASS |
+| `tests/auth.test.ts` | PASS |
+| `tests/vehicle.test.ts` | PASS |
+| `tests/auth.middleware.test.ts` | PASS |
